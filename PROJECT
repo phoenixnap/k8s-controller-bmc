@@ -1,0 +1,7 @@
+domain: api.phoenixnap.com
+repo: github.com/phoenixnap/k8s-bmc
+resources:
+- group: bmc
+  kind: Server
+  version: v1
+version: "2"
