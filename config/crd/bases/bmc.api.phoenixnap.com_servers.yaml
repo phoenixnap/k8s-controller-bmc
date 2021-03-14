@@ -8,6 +8,10 @@ metadata:
   creationTimestamp: null
   name: servers.bmc.api.phoenixnap.com
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .status.status
+    name: Status
+    type: string
   group: bmc.api.phoenixnap.com
   names:
     kind: Server
@@ -15,6 +19,7 @@ spec:
     plural: servers
     singular: server
   scope: Namespaced
+  subresources: {}
   validation:
     openAPIV3Schema:
       description: Server is the Schema for the servers API
@@ -34,13 +39,106 @@ spec:
         spec:
           description: ServerSpec defines the desired state of Server
           properties:
-            foo:
-              description: Foo is an example field of Server. Edit Server_types.go
-                to remove/update
+            description:
+              description: Description of server.
+              maxLength: 250
               type: string
+            hostname:
+              description: Hostname of server.
+              maxLength: 100
+              minLength: 1
+              type: string
+            installDefaultSshKeys:
+              description: Whether or not to install SSH Keys marked as default in
+                additionl to any SSH keys speficied on this resource. Defaults to
+                true.
+              type: boolean
+            location:
+              description: Location ID where the server is created.
+              enum:
+              - PHX
+              - ASH
+              - SGP
+              - NLD
+              type: string
+            networkType:
+              description: The type of networks where this server should be attached.
+              enum:
+              - PUBLIC_AND_PRIVATE
+              - PRIVATE_ONLY
+              type: string
+            os:
+              description: OS ID used for server creation.
+              enum:
+              - ubuntu/bionic
+              - centos/centos7
+              type: string
+            sshKeyIds:
+              description: A list of SSH key IDs (BMC resource ID) that will be installed
+                on the server in addition default SSH keys if enabled.
+              items:
+                type: string
+              type: array
+            type:
+              description: Server type used for creation.
+              enum:
+              - s1.c1.small
+              - s1.c1.medium
+              - s1.c2.medium
+              - s1.c2.large
+              - d1.c1.small
+              - d1.c2.small
+              - d1.c3.small
+              - d1.c4.small
+              - d1.c1.medium
+              - d1.c2.medium
+              - d1.c3.medium
+              - d1.c4.medium
+              - d1.c1.large
+              - d1.c2.large
+              - d1.c3.large
+              - d1.c4.large
+              - d1.m1.medium
+              - d1.m2.medium
+              - d1.m3.medium
+              - d1.m4.medium
+              type: string
+          required:
+          - installDefaultSshKeys
           type: object
         status:
           description: ServerStatus defines the observed state of Server
+          properties:
+            coresPerCpu:
+              format: int32
+              type: integer
+            cpu:
+              type: string
+            cpuCount:
+              format: int32
+              type: integer
+            cpuFrequency:
+              anyOf:
+              - type: integer
+              - type: string
+              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+              x-kubernetes-int-or-string: true
+            id:
+              type: string
+            privateIpAddresses:
+              items:
+                type: string
+              type: array
+            publicIpAddresses:
+              items:
+                type: string
+              type: array
+            ram:
+              type: string
+            status:
+              type: string
+            storage:
+              type: string
           type: object
       type: object
   version: v1

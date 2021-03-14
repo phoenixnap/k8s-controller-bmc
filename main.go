@@ -18,6 +18,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -54,6 +55,15 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
 
+	// validate environment variables
+	if len(os.Getenv(controllers.ENV_BMC_CLIENT_ID)) <= 0 ||
+		len(os.Getenv(controllers.ENV_BMC_CLIENT_SECRET)) <= 0 ||
+		len(os.Getenv(controllers.ENV_BMC_TOKEN_URL)) <= 0 ||
+		len(os.Getenv(controllers.ENV_BMC_ENDPOINT_URL)) <= 0 {
+		setupLog.Error(fmt.Errorf(`incomplete BMC connection configuration`), "unable to start manager")
+		os.Exit(1)
+	}
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
 		MetricsBindAddress: metricsAddr,
@@ -67,12 +77,19 @@ func main() {
 	}
 
 	if err = (&controllers.ServerReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("Server"),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Recorder: mgr.GetEventRecorderFor(`server-controller`),
+		Log:      ctrl.Log.WithName("controllers").WithName("Server"),
+		Scheme:   mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Server")
 		os.Exit(1)
+	}
+	if os.Getenv(`ENABLE_WEBHOOKS`) != `false` {
+		if err = (&bmcv1.Server{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Server")
+			os.Exit(1)
+		}
 	}
 	// +kubebuilder:scaffold:builder
 

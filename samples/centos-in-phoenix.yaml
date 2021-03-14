@@ -1,0 +1,11 @@
+apiVersion: bmc.api.phoenixnap.com/v1
+kind: Server
+metadata:
+  name: centos-in-phoenix
+spec:
+  hostname: sample-centos-in-phoenix
+  installDefaultSshKeys: true
+  description: Created from a Kubernetes controller
+  os: centos/centos7
+  type: s1.c1.small
+  location: PHX
