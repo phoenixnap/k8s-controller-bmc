@@ -1,4 +1,4 @@
-module github.com/phoenixnap/k8s-bmc
+module github.com/phoenixnap/k8s-controller-bmc
 
 go 1.13
 
