@@ -27,8 +27,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	bmcv1 "github.com/phoenixnap/k8s-bmc/api/v1"
-	"github.com/phoenixnap/k8s-bmc/controllers"
+	bmcv1 "github.com/phoenixnap/k8s-controller-bmc/tree/main/api/v1"
+	"https://github.com/phoenixnap/k8s-controller-bmc"
 	// +kubebuilder:scaffold:imports
 )
 
